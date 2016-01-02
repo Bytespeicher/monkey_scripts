@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Linkformat
 // @namespace    https://bytespeicher.org/
-// @version      0.5
+// @version      0.6
 // @description  replace links in next line with links in () with only domain as text
 // @author       mkzero + chaos
 // @match        https://bytespeicher.org/wp-admin/post.php?post=*&action=edit
@@ -14,14 +14,8 @@
 
 
 
-var i = 0, j = 0,
-    lines = document.getElementById('content').innerHTML.split('\n'),
-    menu = document.getElementById('ed_toolbar'),
-    newinput = document.createElement("input"),
-    newdoc = [],
-    match = /(?:(http|ftp)(s|):\/\/)([a-z-.]+[a-z]+)/,
-    link = /(href="|>)((http|ftp)(s|):\/\/)([a-z-.]+[a-z]+)/,
-    hostname;
+var menu = document.getElementById('ed_toolbar'),
+    newinput = document.createElement("input");
 
 newinput.type = "button";
 newinput.id = "qt_content_format_links";
@@ -31,11 +25,26 @@ newinput.addEventListener('click',replace_text,true);
 menu.appendChild(newinput);
 
 function replace_text(){
+    var i = 0, j = 0,
+    lines = document.getElementById('content').innerHTML.split('\n'),
+    newdoc = [],
+    match = /(?:(http|ftp)(s|):\/\/)([a-z-.]+[a-z]+)/,
+    link = /(href="|>)((http|ftp)(s|):\/\/)([a-z-.]+[a-z]+)/,
+    excludeHosts = ['twitter.com'],
+    fullLinkHosts = ['technikkultur-erfurt.de', 'bytespeicher.org'],
+    hostname;
     for (i = 0; i <= lines.length; i+=1) {
-        if (match.test(lines[i]) && !link.test(lines[i]) && lines[i].indexOf('twitter.com') < 0) {
-            hostname = match.exec(lines[i]);
-            hostname = hostname[hostname.length - 1];
-            newdoc[j-1] = lines[i-1].trimRight() + ' (<a href=' + lines[i] + '>' + hostname + '</a>)';
+        if (match.test(lines[i]) && !link.test(lines[i]) && !(new RegExp(excludeHosts.join("|")).test(lines[i]))) {
+            if (!(new RegExp(fullLinkHosts.join('|')).test(lines[i]))) {
+                hostname = match.exec(lines[i]);
+                hostname = hostname[hostname.length - 1];
+                newdoc[j-1] = lines[i-1].trimRight() + ' (<a href=' + lines[i] + '>' + hostname + '</a>)';
+            } else {
+                newdoc[j-1] = '<a href=' + lines[i] + '>' + lines[i-1] + '</a>';
+                if (newdoc[j-1].indexOf('>* ')) {
+                    newdoc[j-1] = '* ' + newdoc[j-1].replace('* ', '');
+                }
+            }
         } else {
             newdoc[j] = lines[i];
             j += 1;
