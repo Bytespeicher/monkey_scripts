@@ -1,12 +1,11 @@
 // ==UserScript==
 // @name         Linkformat
 // @namespace    https://bytespeicher.org/
-// @version      0.7
+// @version      0.8
 // @description  replace links in next line with links in () with only domain as text
 // @author       mkzero + chaos
 // @match        https://bytespeicher.org/wp-admin/post.php?post=*&action=edit
 // @match        https://bytespeicher.org/wp-admin/post-new.php
-// @match        https://bytespeicher.org/wp-admin/post.php?post=1261&action=edit
 // @grant        none
 // ==/UserScript==
 /* jshint -W097 */
